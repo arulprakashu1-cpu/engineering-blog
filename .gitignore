@@ -32,3 +32,6 @@ next-env.d.ts
 
 # uploaded documents (local disk storage)
 /uploads
+
+.vercel
+.env*.local
