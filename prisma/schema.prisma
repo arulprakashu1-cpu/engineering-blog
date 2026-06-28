@@ -1,0 +1,104 @@
+// Prisma schema for the engineering blog.
+// Docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  // directUrl is used by `prisma migrate` when DATABASE_URL is a pooled
+  // connection (Neon/Supabase). Safe to point at the same value if unused.
+  directUrl = env("DIRECT_URL")
+}
+
+model Post {
+  id            String   @id @default(cuid())
+  title         String
+  slug          String   @unique
+  excerpt       String   @default("")
+  // Rich HTML including embedded interactive widget markup. Sanitized at
+  // render time (see src/lib/sanitize.ts).
+  contentHtml   String   @default("")
+  coverImageUrl String?
+  published     Boolean  @default(false)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  labels   PostLabel[]
+  comments Comment[]
+
+  @@index([published, createdAt])
+}
+
+model Label {
+  id    String @id @default(cuid())
+  name  String @unique
+  slug  String @unique
+
+  posts PostLabel[]
+}
+
+// Explicit many-to-many join table between Post and Label.
+model PostLabel {
+  postId  String
+  labelId String
+
+  post  Post  @relation(fields: [postId], references: [id], onDelete: Cascade)
+  label Label @relation(fields: [labelId], references: [id], onDelete: Cascade)
+
+  @@id([postId, labelId])
+  @@index([labelId])
+}
+
+model Admin {
+  id             String   @id @default(cuid())
+  email          String   @unique
+  hashedPassword String
+  createdAt      DateTime @default(now())
+}
+
+// Document categories for the resources module. All categories are
+// file-upload based (PDF / office docs / images / etc.).
+enum DocumentCategory {
+  STANDARD_DOCUMENT
+  LESSON_LEARNT
+  CHECKLIST
+}
+
+// An uploaded resource document. The binary lives on disk under uploads/;
+// this row stores metadata + the storageKey (filename on disk). Served via
+// /api/files/[id].
+model Document {
+  id          String           @id @default(cuid())
+  title       String
+  description String           @default("")
+  category    DocumentCategory
+  fileName    String // original upload filename
+  mimeType    String
+  fileSize    Int // bytes
+  // File bytes stored in the DB (bytea) so uploads persist on any host,
+  // including Vercel's ephemeral filesystem. Excluded from list queries via
+  // explicit `select` for performance; only the /api/files route loads it.
+  fileData    Bytes
+  published   Boolean          @default(true)
+  createdAt   DateTime         @default(now())
+  updatedAt   DateTime         @updatedAt
+
+  @@index([category, published, createdAt])
+}
+
+model Comment {
+  id         String   @id @default(cuid())
+  postId     String
+  authorName String
+  body       String
+  approved   Boolean  @default(false)
+  createdAt  DateTime @default(now())
+
+  post Post @relation(fields: [postId], references: [id], onDelete: Cascade)
+
+  @@index([postId, approved])
+  @@index([approved, createdAt])
+}

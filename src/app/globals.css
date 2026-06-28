@@ -1,0 +1,82 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --content-max: 72ch;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  @apply bg-slate-50 text-slate-800 antialiased;
+}
+
+/* ---------------------------------------------------------------------------
+   Post content ("prose") styling. Applied to the sanitized contentHtml so
+   headings, paragraphs, tables, code, and embedded widgets all look right.
+   Embedded widget markup keeps its own inline styles; these are sensible
+   defaults for everything else.
+--------------------------------------------------------------------------- */
+.prose {
+  @apply text-[1.05rem] leading-relaxed text-slate-800;
+}
+.prose > * + * {
+  @apply mt-5;
+}
+.prose h1 {
+  @apply mt-10 mb-4 text-3xl font-bold tracking-tight text-slate-900;
+}
+.prose h2 {
+  @apply mt-10 mb-3 text-2xl font-bold tracking-tight text-slate-900;
+}
+.prose h3 {
+  @apply mt-8 mb-2 text-xl font-semibold text-slate-900;
+}
+.prose h4 {
+  @apply mt-6 mb-2 text-lg font-semibold text-slate-900;
+}
+.prose p {
+  @apply leading-relaxed;
+}
+.prose a {
+  @apply text-brand-600 underline underline-offset-2 hover:text-brand-700;
+}
+.prose ul {
+  @apply list-disc space-y-1 pl-6;
+}
+.prose ol {
+  @apply list-decimal space-y-1 pl-6;
+}
+.prose blockquote {
+  @apply border-l-4 border-slate-300 pl-4 italic text-slate-600;
+}
+.prose code {
+  @apply rounded bg-slate-100 px-1.5 py-0.5 font-mono text-[0.9em] text-pink-600;
+}
+.prose pre {
+  @apply overflow-x-auto rounded-lg bg-slate-900 p-4 text-sm text-slate-100;
+}
+.prose pre code {
+  @apply bg-transparent p-0 text-slate-100;
+}
+.prose img {
+  @apply mx-auto my-6 max-w-full rounded-lg;
+}
+.prose table {
+  @apply my-6 w-full border-collapse overflow-hidden rounded-lg text-left text-sm;
+}
+.prose th {
+  @apply border border-slate-200 bg-slate-100 px-3 py-2 font-semibold;
+}
+.prose td {
+  @apply border border-slate-200 px-3 py-2;
+}
+.prose hr {
+  @apply my-8 border-slate-200;
+}
+.prose iframe {
+  @apply my-6 w-full rounded-lg border border-slate-200;
+}
